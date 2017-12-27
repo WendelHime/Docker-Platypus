@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    image: wendelhime/platypus:services
+    build: .
+    command: ["auxiliar.py", "${ORGANISM}", "${TYPE}", "--dbname", "${DBNAME}", "--dbhost", "${DBHOST}", "--dbusername", "${DBUSERNAME}", "--dbpassword", "${DBPASSWORD}"]
+    volumes:
+      - /home/wendelhlc/teste_database/upload_xml/output_dir/Curtobacterium-Services:/Curtobacterium-Services
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 200MB
+      restart_policy:    
+        condition: on-failure
+    ports:
+      - "3000:80"
+    networks:    
+      - webnet
+networks:      
+  webnet:
+
+# vim:ft=ansible:
