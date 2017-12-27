@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import re
 import argparse
@@ -28,21 +29,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if(args.type == "website"):
-        replaceLine(args.organism + "-Website/" + args.organism.lower() + "_website.conf", 
+        replaceLine("/" + args.organism + "-Website/" + args.organism.lower() + "_website.conf", 
                 "rest_endpoint ([\w:/.]+)+", 
                 "rest_endpoint "+args.restendpoint)
-        replaceLine(args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
+        replaceLine("/" + args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
                 "dsn => 'dbi:SQLite:([/\w\-.]+)+'", 
                 "dsn => 'dbi:SQLite:/"+args.organism+"-Website/database.db'")
         os.system("./"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -p 80 -r")
     elif(args.type == "service"):    
-        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "dsn\s*=>\s*\"dbi:Pg:dbname=\w+;host=\w+\"", 
                 "dsn      => \"dbi:Pg:dbname="+args.dbname+";host="+args.dbhost+"\"")
-        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "user\s*=>\s*\"\w+\"",
                 "user     => \""+args.dbusername+"\"")
-        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "password\s*=>\s*\"\w+\"",
                 "password => \""+args.dbpassword+"\"")
         os.system("./"+args.organism + "-Services/script/" + args.organism.lower() + "_services_server.pl -p 80 -r ")
