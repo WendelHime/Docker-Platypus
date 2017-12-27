@@ -12,7 +12,7 @@ def replaceLine(filepath, regex, replace):
     regex = re.compile(regex)
     for i in range(1, len(content)):
        content[i] = regex.sub(replace, content[i])
-    fh = open(filepathConfFile, "w")
+    fh = open(filepath, "w")
     fh.writelines(content)
     fh.close()
 
@@ -34,7 +34,16 @@ if __name__ == "__main__":
         replaceLine(args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
                 "dsn => 'dbi:SQLite:([/\w\-.]+)+'", 
                 "dsn => 'dbi:SQLite:/"+args.organism+"-Website/database.db'")
-        os.system("./"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -r")
+        os.system("./"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -p 80 -r")
     elif(args.type == "service"):    
-        os.system("echo test")
+        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+                "dsn\s*=>\s*\"dbi:Pg:dbname=\w+;host=\w+\"", 
+                "dsn      => \"dbi:Pg:dbname="+args.dbname+";host="+args.dbhost+"\"")
+        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+                "user\s*=>\s*\"\w+\"",
+                "user     => \""+args.dbusername+"\"")
+        replaceLine(args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+                "password\s*=>\s*\"\w+\"",
+                "password => \""+args.dbpassword+"\"")
+        os.system("./"+args.organism + "-Services/script/" + args.organism.lower() + "_services_server.pl -p 80 -r ")
 
