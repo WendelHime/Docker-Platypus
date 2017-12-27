@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    image: wendelhime/platypus:website
+    build: .
+    command: ["auxiliar.py", "${ORGANISM}", "${TYPE}", "--restendpoint", "${RESTENDPOINT}"]
+    volumes:
+      - /home/wendelhlc/teste_database/upload_xml/output_dir/Curtobacterium-Website:/Curtobacterium-Website
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 200MB
+      restart_policy:    
+        condition: on-failure
+    ports:
+      - "3001:80"
+    networks:    
+      - webnet
+networks:      
+  webnet:
+
+# vim:ft=ansible:
