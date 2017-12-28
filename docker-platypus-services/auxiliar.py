@@ -3,6 +3,7 @@ import os
 import re
 import argparse
 import shutil
+import subprocess
 
 def replaceLine(filepath, regex, replace):
     """ (str, str, str) -> (none)
@@ -23,10 +24,13 @@ if __name__ == "__main__":
     parser.add_argument("type", type=str, help="Application type to be runned", choices=['website', 'service'])
     parser.add_argument("--restendpoint", type=str, help="Services REST endpoint URL, if you're running website, this is required")
     parser.add_argument("--dbname", type=str, help="Database name")
-    parser.add_argument("--dbhost", type=str, help="Database host URL")
+    parser.add_argument("--dbhost", type=str, help="Database host URL, by deafult use IP from host machine")
     parser.add_argument("--dbusername", type=str, help="Database username")
     parser.add_argument("--dbpassword", type=str, help="Database password")
     args = parser.parse_args()
+    if args.dbhost == "":
+        regex = re.compile("default via (\d+\.+\d+\.\d+\.\d+)+")
+        args.dbhost = subprocess.run(["ip", "route"], stdout=subprocess.PIPE).stdout.decode('utf-8')
 
     if(args.type == "website"):
         shutil.copytree("/" + args.organism + "-Website", "/var/www/"+ args.organism + "-Website")
