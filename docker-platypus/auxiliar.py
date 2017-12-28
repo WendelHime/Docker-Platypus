@@ -8,11 +8,10 @@ def replaceLine(filepath, regex, replace):
         Method used to replace line
     """
     fh = open(filepath, "r")
-    content = fh.readlines()
+    content = fh.read()
     fh.close()
     regex = re.compile(regex)
-    for i in range(1, len(content)):
-       content[i] = regex.sub(replace, content[i])
+    content = regex.sub(replace, content)
     fh = open(filepath, "w")
     fh.writelines(content)
     fh.close()

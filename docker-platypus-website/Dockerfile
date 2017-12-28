@@ -39,6 +39,7 @@ RUN echo $PERL5LIB
 ADD auxiliar.py /usr/local/bin
 RUN chmod +x /usr/local/bin/auxiliar.py
 RUN export PATH=$PATH:/usr/local/bin
+RUN mkdir -p /var/www
 
 EXPOSE 80 
 

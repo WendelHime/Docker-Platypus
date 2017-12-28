@@ -2,17 +2,17 @@
 import os
 import re
 import argparse
+import shutil
 
 def replaceLine(filepath, regex, replace):
     """ (str, str, str) -> (none)
         Method used to replace line
     """
     fh = open(filepath, "r")
-    content = fh.readlines()
+    content = fh.read()
     fh.close()
     regex = re.compile(regex)
-    for i in range(1, len(content)):
-       content[i] = regex.sub(replace, content[i])
+    content = regex.sub(replace, content)
     fh = open(filepath, "w")
     fh.writelines(content)
     fh.close()
@@ -29,22 +29,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if(args.type == "website"):
-        replaceLine("/" + args.organism + "-Website/" + args.organism.lower() + "_website.conf", 
+        shutil.copytree("/" + args.organism + "-Website", "/var/www/"+ args.organism + "-Website", symlinks=True)
+        replaceLine("/var/www/" + args.organism + "-Website/" + args.organism.lower() + "_website.conf", 
                 "rest_endpoint ([\w:/.]+)+", 
                 "rest_endpoint "+args.restendpoint)
-        replaceLine("/" + args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
+        replaceLine("/var/www/" + args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
                 "dsn => 'dbi:SQLite:([/\w\-.]+)+'", 
                 "dsn => 'dbi:SQLite:/"+args.organism+"-Website/database.db'")
-        os.system("./"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -p 80 -r")
+        os.system("/var/www/"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -p 80 -r")
     elif(args.type == "service"):    
-        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        shutil.copytree("/" + args.organism + "-Services", "/var/www/" + args.organism + "-Services")
+        replaceLine("/var/www/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "dsn\s*=>\s*\"dbi:Pg:dbname=\w+;host=\w+\"", 
                 "dsn      => \"dbi:Pg:dbname="+args.dbname+";host="+args.dbhost+"\"")
-        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        replaceLine("/var/www/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "user\s*=>\s*\"\w+\"",
                 "user     => \""+args.dbusername+"\"")
-        replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
+        replaceLine("/var/www/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "password\s*=>\s*\"\w+\"",
                 "password => \""+args.dbpassword+"\"")
-        os.system("./"+args.organism + "-Services/script/" + args.organism.lower() + "_services_server.pl -p 80 -r ")
+        os.system("/var/www/"+args.organism + "-Services/script/" + args.organism.lower() + "_services_server.pl -p 80 -r ")
 
