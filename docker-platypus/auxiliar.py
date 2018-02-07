@@ -7,15 +7,14 @@ def replaceLine(filepath, regex, replace):
     """ (str, str, str) -> (none)
         Method used to replace line
     """
-    fh = open(filepath, "r")
-    content = fh.read()
+    fh = open(filepath, "rb")
+    content = fh.read().decode('utf-8')
     fh.close()
     regex = re.compile(regex)
     content = regex.sub(replace, content)
-    print(replace)
-    fh = open(filepath, "w")
-    fh.writelines(content)
-    print(content)
+    print(str.encode(content))
+    fh = open(filepath, "wb")
+    fh.write(str.encode(content))
     fh.close()
 
 if __name__ == "__main__":
@@ -31,13 +30,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if(args.type == "website"):
+        os.system("echo 'rest_endpoint "+args.restendpoint+"' >> /" + args.organism + "-Website/" + args.organism.lower() + "_website.conf")
         replaceLine("/" + args.organism + "-Website/" + args.organism.lower() + "_website.conf", 
                 "rest_endpoint ([\w:/.]+)+", 
                 "rest_endpoint "+args.restendpoint)
         replaceLine("/" + args.organism + "-Website/lib/" + args.organism + "/Website/Model/Basic.pm", 
                 "dsn => 'dbi:SQLite:([/\w\-.]+)+'", 
                 "dsn => 'dbi:SQLite:/"+args.organism+"-Website/database.db'")
-        os.system("./"+args.organism + "-Website/script/" + args.organism.lower() + "_website_server.pl -p " + str(args.port) + " -r")
+        os.system("export PATH=$PATH:/"+args.organism + "-Website/script")
+        os.system("/"+args.organism + "-Website/script/"+args.organism.lower() + "_website_server.pl -p " + str(args.port) + " -r")
     elif(args.type == "service"):    
         replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "dsn\s*=>\s*\"dbi:Pg:dbname=\w+;host=\w+\"", 
@@ -48,5 +49,5 @@ if __name__ == "__main__":
         replaceLine("/" + args.organism + "-Services/lib/"+args.organism+"/Services/Model/SearchDatabaseRepository.pm", 
                 "password\s*=>\s*\"\w+\"",
                 "password => \""+args.dbpassword+"\"")
-        os.system("./"+args.organism + "-Services/script/" + args.organism.lower() + "_services_server.pl -p " + str(args.port) + " -r ")
-
+        os.system("export PATH=$PATH:/"+args.organism + "-Services/script")
+        os.system("/"+args.organism + "-Services/script/"+args.organism.lower() + "_services_server.pl -p " + str(args.port) + " -r ")
