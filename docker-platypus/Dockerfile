@@ -29,6 +29,7 @@ RUN PERL_MM_USE_DEFAULT=1 cpan Catalyst::Controller::REST Catalyst::Model::DBIC:
 RUN PERL_MM_USE_DEFAULT=1 cpan Capture::Tiny DBI Task::Catalyst Task::Plack Reindeer
 
 RUN PERL_MM_USE_DEFAULT=1 cpan SQL::Library Catalyst::Model::DBI::SQL::Library Catalyst::Model::DBI 
+RUN cpan Report_HTML_DB
 
 COPY egene2-code/ /usr/local/genome/egene2/bin/
 RUN export PATH=$PATH:/usr/local/genome/egene2/bin
